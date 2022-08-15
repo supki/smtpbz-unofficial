@@ -1,0 +1,76 @@
+name:                smtpbz
+version:             1.0.0
+synopsis:            This is smtpbz
+description:         See README.markdown
+license:             BSD2
+author:              Matvey Aksenov
+maintainer:          matvey.aksenov@gmail.com
+copyright:           2022 Matvey Aksenov
+extra-source-files:
+  - README.markdown
+  - CHANGELOG.markdown
+
+custom-setup:
+  dependencies:
+    - base
+    - Cabal
+    - directory
+    - filepath
+    - process
+
+dependencies:
+  - base >= 4.7 && < 5
+
+default-extensions:
+  - OverloadedStrings
+
+library:
+  dependencies:
+    - aeson
+    - bytestring
+    - envparse
+    - http-conduit
+    - http-types
+    - servant-multipart
+    - servant-server
+    - text
+  source-dirs:
+    src
+  other-modules:
+    - Meta_smtpbz
+    - Paths_smtpbz
+  ghc-options:
+    - -funbox-strict-fields
+    - -Wall
+    - -Werror
+
+executables:
+  smtpbz:
+    dependencies:
+      - smtpbz
+      - optparse-applicative
+    source-dirs:
+      driver
+    main:
+      Main.hs
+    ghc-options:
+      - -Wall
+      - -Werror
+      - -threaded
+      - -with-rtsopts=-N
+
+tests:
+  spec:
+    dependencies:
+      - smtpbz
+      - hspec
+    source-dirs:
+      test
+    main:
+      Spec.hs
+    ghc-options:
+      - -freduction-depth=0
+      - -Wall
+      - -Werror
+      - -threaded
+      - -with-rtsopts=-N
