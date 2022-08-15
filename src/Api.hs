@@ -1,6 +1,12 @@
 {-# LANGUAGE RecordWildCards #-}
 module Api
   ( SmtpSend(..)
+  , user
+  , userStats
+  , userDomains
+  , userDomain
+  , userIPs
+  , userIP
   , sendSmtp
   , successfulCall
   , debugPrintResponse
@@ -28,6 +34,30 @@ data SmtpSend = SmtpSend
   -- , headers :: ByteString ???
   } deriving (Show, Eq)
 
+user :: Cfg -> IO (Http.Response Lazy.ByteString)
+user cfg =
+  simpleApiCall cfg "user"
+
+userStats :: Cfg -> IO (Http.Response Lazy.ByteString)
+userStats cfg =
+  simpleApiCall cfg "user/stats"
+
+userDomains :: Cfg -> IO (Http.Response Lazy.ByteString)
+userDomains cfg =
+  simpleApiCall cfg "user/domain"
+
+userDomain :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
+userDomain cfg domain =
+  simpleApiCall cfg (printf "user/domain/%s" domain)
+
+userIPs :: Cfg -> IO (Http.Response Lazy.ByteString)
+userIPs cfg =
+  simpleApiCall cfg "user/ip"
+
+userIP :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
+userIP cfg ip = do
+  simpleApiCall cfg (printf "user/ip/%s" ip)
+
 sendSmtp :: Cfg -> SmtpSend -> IO (Http.Response Lazy.ByteString)
 sendSmtp cfg SmtpSend {..} = do
   req <- prepareApiCall cfg "smtp/send"
@@ -44,6 +74,11 @@ sendSmtp cfg SmtpSend {..} = do
       , ("html", pure html)
       , ("text", text)
       ]
+
+simpleApiCall :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
+simpleApiCall cfg path = do
+  req <- prepareApiCall cfg path
+  callApi cfg req
 
 prepareApiCall :: Cfg -> String -> IO Http.Request
 prepareApiCall Cfg {..} path = do

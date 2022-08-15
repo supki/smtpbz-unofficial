@@ -13,7 +13,13 @@ import Api (SmtpSend(..))
 
 
 data Opts
-  = OptsSmtpSend SmtpSend
+  = OptsUser
+  | OptsUserStats
+  | OptsUserDomains
+  | OptsUserDomain String
+  | OptsUserIPs
+  | OptsUserIP String
+  | OptsSmtpSend SmtpSend
     deriving (Show, Eq)
 
 get :: IO Opts
@@ -26,7 +32,23 @@ get =
 parser :: Parser Opts
 parser =
   subparser
-    (command "smtp-send" (info (fmap OptsSmtpSend smtpSend) (progDesc "Send an email")))
+    ( command "user" (info (pure OptsUser) (progDesc "User data"))
+   <> command "user-stats" (info (pure OptsUserStats) (progDesc "User mail stats"))
+   <> command "user-domains" (info (pure OptsUserDomains) (progDesc "All domains data"))
+   <> command "user-domain" (info (fmap OptsUserDomain userDomain) (progDesc "Domain data"))
+   <> command "user-ips" (info (pure OptsUserIPs) (progDesc "All IPs data"))
+   <> command "user-ip" (info (fmap OptsUserIP userIP) (progDesc "IP data"))
+
+   <> command "smtp-send" (info (fmap OptsSmtpSend smtpSend) (progDesc "Send an email"))
+    )
+
+userDomain :: Parser String
+userDomain =
+  argument str (metavar "DOMAIN")
+
+userIP :: Parser String
+userIP =
+  argument str (metavar "IP")
 
 smtpSend :: Parser SmtpSend
 smtpSend = do

@@ -1,7 +1,7 @@
 module Main (main) where
 
-import           Data.Bool (bool)
-import           System.Exit (exitFailure, exitSuccess)
+import           Control.Monad (unless)
+import           System.Exit (exitFailure)
 
 import qualified Api
 import qualified Cfg
@@ -14,7 +14,19 @@ main = do
   cfg <- Cfg.get
   opts <- Opts.get
   res <- case opts of
+    OptsUser ->
+      Api.user cfg
+    OptsUserStats ->
+      Api.userStats cfg
+    OptsUserDomains ->
+      Api.userDomains cfg
+    OptsUserDomain domain ->
+      Api.userDomain cfg domain
+    OptsUserIPs ->
+      Api.userIPs cfg
+    OptsUserIP ip ->
+      Api.userIP cfg ip
     OptsSmtpSend cmdOpts ->
       Api.sendSmtp cfg cmdOpts
   Api.debugPrintResponse res
-  bool exitFailure exitSuccess (Api.successfulCall res)
+  unless (Api.successfulCall res) exitFailure
