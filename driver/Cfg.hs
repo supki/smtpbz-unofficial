@@ -13,6 +13,7 @@ import           Env
 import qualified Network.HTTP.Conduit as Http
 
 import qualified Meta_smtpbz as Meta
+import           Has (Has(..))
 
 
 data Cfg = Cfg
@@ -20,6 +21,17 @@ data Cfg = Cfg
   , cfgBaseUrl :: Text
   , cfgMan     :: Http.Manager
   }
+
+instance Has Cfg where
+  apiKey l cfg =
+    fmap (\key -> cfg {cfgApiKey = key}) (l (cfgApiKey cfg))
+  {-# INLINE apiKey #-}
+  baseUrl l cfg =
+    fmap (\url -> cfg {cfgBaseUrl = url}) (l (cfgBaseUrl cfg))
+  {-# INLINE baseUrl #-}
+  httpMan l cfg =
+    fmap (\man -> cfg {cfgMan = man}) (l (cfgMan cfg))
+  {-# INLINE httpMan #-}
 
 get :: IO Cfg
 get = do

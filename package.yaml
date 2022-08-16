@@ -28,7 +28,6 @@ library:
   dependencies:
     - aeson
     - bytestring
-    - envparse
     - http-conduit
     - http-types
     - servant-multipart
@@ -36,9 +35,6 @@ library:
     - text
   source-dirs:
     src
-  other-modules:
-    - Meta_smtpbz
-    - Paths_smtpbz
   ghc-options:
     - -funbox-strict-fields
     - -Wall
@@ -49,11 +45,18 @@ executables:
     dependencies:
       - smtpbz
       - bytestring
+      - envparse
+      - http-conduit
+      - text
       - optparse-applicative
     source-dirs:
       driver
     main:
       Main.hs
+    other-modules:
+      - Cfg
+      - Opts
+      - Meta_smtpbz
     ghc-options:
       - -Wall
       - -Werror

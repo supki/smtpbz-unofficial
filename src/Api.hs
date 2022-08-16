@@ -32,30 +32,30 @@ import qualified Network.HTTP.Conduit as Http
 import qualified Network.HTTP.Types as Http
 import           Text.Printf (printf)
 
-import           Cfg (Cfg(..))
+import           Has (Has(..), view)
 
 
-user :: Cfg -> IO (Http.Response Lazy.ByteString)
+user :: Has cfg => cfg -> IO (Http.Response Lazy.ByteString)
 user cfg =
   simpleApiCall cfg "user"
 
-userStats :: Cfg -> IO (Http.Response Lazy.ByteString)
+userStats :: Has cfg => cfg -> IO (Http.Response Lazy.ByteString)
 userStats cfg =
   simpleApiCall cfg "user/stats"
 
-userDomains :: Cfg -> IO (Http.Response Lazy.ByteString)
+userDomains :: Has cfg => cfg -> IO (Http.Response Lazy.ByteString)
 userDomains cfg =
   simpleApiCall cfg "user/domain"
 
-userDomain :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
+userDomain :: Has cfg => cfg -> String -> IO (Http.Response Lazy.ByteString)
 userDomain cfg domain =
   simpleApiCall cfg (printf "user/domain/%s" domain)
 
-userIPs :: Cfg -> IO (Http.Response Lazy.ByteString)
+userIPs :: Has cfg => cfg -> IO (Http.Response Lazy.ByteString)
 userIPs cfg =
   simpleApiCall cfg "user/ip"
 
-userIP :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
+userIP :: Has cfg => cfg -> String -> IO (Http.Response Lazy.ByteString)
 userIP cfg ip = do
   simpleApiCall cfg (printf "user/ip/%s" ip)
 
@@ -68,7 +68,7 @@ data LogMessages = LogMessages
   , tag    :: Maybe ByteString
   } deriving (Show, Eq)
 
-logMessages :: Cfg -> LogMessages -> IO (Http.Response Lazy.ByteString)
+logMessages :: Has cfg => cfg -> LogMessages -> IO (Http.Response Lazy.ByteString)
 logMessages cfg LogMessages {..} = do
   req <- prepareApiCall cfg "log/message"
   callApi cfg (Http.setQueryString params req)
@@ -84,7 +84,7 @@ logMessages cfg LogMessages {..} = do
     , ("tag", tag)
     ]
 
-logMessage :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
+logMessage :: Has cfg => cfg -> String -> IO (Http.Response Lazy.ByteString)
 logMessage cfg messageID = do
   simpleApiCall cfg (printf "log/message/%s" messageID)
 
@@ -95,7 +95,7 @@ data Unsubscribe = Unsubscribe
   , reason  :: Maybe ByteString
   } deriving (Show, Eq)
 
-unsubscribe :: Cfg -> Unsubscribe -> IO (Http.Response Lazy.ByteString)
+unsubscribe :: Has cfg => cfg -> Unsubscribe -> IO (Http.Response Lazy.ByteString)
 unsubscribe cfg Unsubscribe {..} = do
   req <- prepareApiCall cfg "unsubscribe"
   callApi cfg (Http.setQueryString params req)
@@ -107,7 +107,7 @@ unsubscribe cfg Unsubscribe {..} = do
     , ("reason", reason)
     ]
 
-unsubscribeAdd :: Cfg -> ByteString -> IO (Http.Response Lazy.ByteString)
+unsubscribeAdd :: Has cfg => cfg -> ByteString -> IO (Http.Response Lazy.ByteString)
 unsubscribeAdd cfg address = do
   req <- prepareApiCall cfg "unsubscribe/add"
   callApi cfg (Http.urlEncodedBody params req)
@@ -116,7 +116,7 @@ unsubscribeAdd cfg address = do
     [ ("address", address)
     ]
 
-unsubscribeRemove :: Cfg -> ByteString -> IO (Http.Response Lazy.ByteString)
+unsubscribeRemove :: Has cfg => cfg -> ByteString -> IO (Http.Response Lazy.ByteString)
 unsubscribeRemove cfg address = do
   req <- prepareApiCall cfg "unsubscribe/remove"
   callApi cfg (Http.urlEncodedBody params req)
@@ -125,7 +125,7 @@ unsubscribeRemove cfg address = do
     [ ("address", address)
     ]
 
-unsubscribeRemoveAll :: Cfg -> IO (Http.Response Lazy.ByteString)
+unsubscribeRemoveAll :: Has cfg => cfg -> IO (Http.Response Lazy.ByteString)
 unsubscribeRemoveAll cfg = do
   req <- prepareApiCall cfg "unsubscribe/removeall"
   callApi cfg (Http.urlEncodedBody [] req)
@@ -141,7 +141,7 @@ data SmtpSend = SmtpSend
   -- , headers :: ByteString ???
   } deriving (Show, Eq)
 
-sendSmtp :: Cfg -> SmtpSend -> IO (Http.Response Lazy.ByteString)
+sendSmtp :: Has cfg => cfg -> SmtpSend -> IO (Http.Response Lazy.ByteString)
 sendSmtp cfg SmtpSend {..} = do
   req <- prepareApiCall cfg "smtp/send"
   callApi cfg (Http.urlEncodedBody (collapse params) req)
@@ -156,25 +156,25 @@ sendSmtp cfg SmtpSend {..} = do
     , ("text", text)
     ]
 
-checkEmail :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
+checkEmail :: Has cfg => cfg -> String -> IO (Http.Response Lazy.ByteString)
 checkEmail cfg email =
   simpleApiCall cfg (printf "check/email/%s" email)
 
-simpleApiCall :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
+simpleApiCall :: Has cfg => cfg -> String -> IO (Http.Response Lazy.ByteString)
 simpleApiCall cfg path = do
   req <- prepareApiCall cfg path
   callApi cfg req
 
-prepareApiCall :: Cfg -> String -> IO Http.Request
-prepareApiCall Cfg {..} path = do
-  req <- Http.parseRequest (printf "%s/%s" cfgBaseUrl path)
+prepareApiCall :: Has cfg => cfg -> String -> IO Http.Request
+prepareApiCall cfg path = do
+  req <- Http.parseRequest (printf "%s/%s" (view baseUrl cfg) path)
   pure req
-    { Http.requestHeaders = ("Authorization", cfgApiKey) : Http.requestHeaders req
+    { Http.requestHeaders = ("Authorization", view apiKey cfg) : Http.requestHeaders req
     }
 
-callApi :: Cfg -> Http.Request -> IO (Http.Response Lazy.ByteString)
-callApi Cfg {..} req =
-  Http.httpLbs req cfgMan
+callApi :: Has cfg => cfg -> Http.Request -> IO (Http.Response Lazy.ByteString)
+callApi cfg req =
+  Http.httpLbs req (view httpMan cfg)
 
 successfulCall :: Http.Response Lazy.ByteString -> Bool
 successfulCall res =
