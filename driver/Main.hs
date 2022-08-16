@@ -26,6 +26,10 @@ main = do
       Api.userIPs cfg
     OptsUserIP ip ->
       Api.userIP cfg ip
+    OptsLogMessages logMessages ->
+      Api.logMessages cfg logMessages
+    OptsLogMessage messageID ->
+      Api.logMessage cfg messageID
     OptsSmtpSend cmdOpts ->
       Api.sendSmtp cfg cmdOpts
   Api.debugPrintResponse res

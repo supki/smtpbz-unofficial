@@ -1,38 +1,33 @@
+{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE RecordWildCards #-}
 module Api
-  ( SmtpSend(..)
+  ( LogMessages(..)
+  , SmtpSend(..)
   , user
   , userStats
   , userDomains
   , userDomain
   , userIPs
   , userIP
+  , logMessages
+  , logMessage
   , sendSmtp
   , successfulCall
   , debugPrintResponse
   ) where
 
+import           Data.Bool (bool)
 import           Data.ByteString (ByteString)
 import qualified Data.ByteString.Lazy as Lazy (ByteString)
 import qualified Data.ByteString.Lazy.Char8 as ByteString.Lazy
 import           Data.Maybe (mapMaybe)
+import           Data.String (fromString)
 import qualified Network.HTTP.Conduit as Http
 import qualified Network.HTTP.Types as Http
 import           Text.Printf (printf)
 
 import           Cfg (Cfg(..))
 
-
-data SmtpSend = SmtpSend
-  { from    :: ByteString
-  , name    :: Maybe ByteString
-  , subject :: ByteString
-  , to      :: ByteString
-  , replyTo :: Maybe ByteString
-  , html    :: ByteString
-  , text    :: Maybe ByteString
-  -- , headers :: ByteString ???
-  } deriving (Show, Eq)
 
 user :: Cfg -> IO (Http.Response Lazy.ByteString)
 user cfg =
@@ -58,22 +53,60 @@ userIP :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
 userIP cfg ip = do
   simpleApiCall cfg (printf "user/ip/%s" ip)
 
+data SmtpSend = SmtpSend
+  { from    :: ByteString
+  , name    :: Maybe ByteString
+  , subject :: ByteString
+  , to      :: ByteString
+  , replyTo :: Maybe ByteString
+  , html    :: ByteString
+  , text    :: Maybe ByteString
+  -- , headers :: ByteString ???
+  } deriving (Show, Eq)
+
 sendSmtp :: Cfg -> SmtpSend -> IO (Http.Response Lazy.ByteString)
 sendSmtp cfg SmtpSend {..} = do
   req <- prepareApiCall cfg "smtp/send"
-  callApi cfg (Http.urlEncodedBody params req)
+  callApi cfg (Http.urlEncodedBody (collapse params) req)
  where
   params =
-    -- :: [(a, Maybe b)] -> [(a, b)]
-    mapMaybe sequence
-      [ ("from", pure from)
-      , ("name", name)
-      , ("subject", pure subject)
-      , ("to", pure to)
-      , ("reply", replyTo)
-      , ("html", pure html)
-      , ("text", text)
-      ]
+    [ ("from", pure from)
+    , ("name", name)
+    , ("subject", pure subject)
+    , ("to", pure to)
+    , ("reply", replyTo)
+    , ("html", pure html)
+    , ("text", text)
+    ]
+
+data LogMessages = LogMessages
+  { limit  :: Maybe Int
+  , offset :: Maybe Int
+  , from   :: Maybe ByteString
+  , to     :: Maybe ByteString
+  , isOpen :: Maybe Bool
+  , tag    :: Maybe ByteString
+  } deriving (Show, Eq)
+
+logMessages :: Cfg -> LogMessages -> IO (Http.Response Lazy.ByteString)
+logMessages cfg LogMessages {..} = do
+  req <- prepareApiCall cfg "log/message"
+  callApi cfg (Http.setQueryString params req)
+ where
+  params =
+    [ ("limit", fmap (fromString . show) limit)
+    , ("offset", fmap (fromString . show) offset)
+    , ("from", from)
+    , ("to", to)
+      -- documentation says it's a normal person's bool,
+      -- but in reality it's a C-programmer's bool
+    , ("is_open", fmap (bool "0" "1") isOpen)
+    , ("tag", tag)
+    ]
+
+logMessage :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
+logMessage cfg messageID = do
+  simpleApiCall cfg (printf "log/message/%s" messageID)
 
 simpleApiCall :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
 simpleApiCall cfg path = do
@@ -100,3 +133,7 @@ successfulCall res =
 debugPrintResponse :: Http.Response Lazy.ByteString -> IO ()
 debugPrintResponse =
   ByteString.Lazy.putStrLn . Http.responseBody
+
+collapse :: [(a, Maybe b)] -> [(a, b)]
+collapse =
+  mapMaybe sequence

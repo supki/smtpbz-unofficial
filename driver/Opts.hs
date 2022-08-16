@@ -9,7 +9,7 @@ module Opts
 import Options.Applicative
 
 import Cfg (usageHeader)
-import Api (SmtpSend(..))
+import Api (LogMessages(..), SmtpSend(..))
 
 
 data Opts
@@ -19,6 +19,8 @@ data Opts
   | OptsUserDomain String
   | OptsUserIPs
   | OptsUserIP String
+  | OptsLogMessages LogMessages
+  | OptsLogMessage String
   | OptsSmtpSend SmtpSend
     deriving (Show, Eq)
 
@@ -32,14 +34,26 @@ get =
 parser :: Parser Opts
 parser =
   subparser
-    ( command "user" (info (pure OptsUser) (progDesc "User data"))
-   <> command "user-stats" (info (pure OptsUserStats) (progDesc "User mail stats"))
-   <> command "user-domains" (info (pure OptsUserDomains) (progDesc "All domains data"))
-   <> command "user-domain" (info (fmap OptsUserDomain userDomain) (progDesc "Domain data"))
-   <> command "user-ips" (info (pure OptsUserIPs) (progDesc "All IPs data"))
-   <> command "user-ip" (info (fmap OptsUserIP userIP) (progDesc "IP data"))
+    ( command "user"
+        (info (pure OptsUser) (progDesc "User data"))
+   <> command "user-stats"
+        (info (pure OptsUserStats) (progDesc "User mail stats"))
+   <> command "user-domains"
+        (info (pure OptsUserDomains) (progDesc "All domains data"))
+   <> command "user-domain"
+        (info (fmap OptsUserDomain userDomain) (progDesc "Domain data"))
+   <> command "user-ips"
+        (info (pure OptsUserIPs) (progDesc "All IPs data"))
+   <> command "user-ip"
+        (info (fmap OptsUserIP userIP) (progDesc "IP data"))
 
-   <> command "smtp-send" (info (fmap OptsSmtpSend smtpSend) (progDesc "Send an email"))
+   <> command "log-messages"
+        (info (fmap OptsLogMessages logMessages) (progDesc "Get sent e-mails"))
+   <> command "log-message"
+        (info (fmap OptsLogMessage logMessage) (progDesc "Get sent e-mail by ID"))
+
+   <> command "smtp-send"
+        (info (fmap OptsSmtpSend smtpSend) (progDesc "Send an e-mail"))
     )
 
 userDomain :: Parser String
@@ -49,6 +63,26 @@ userDomain =
 userIP :: Parser String
 userIP =
   argument str (metavar "IP")
+
+logMessages :: Parser LogMessages
+logMessages = do
+  limit <-
+    optional (option auto (long "limit"))
+  offset <-
+    optional (option auto (long "offset"))
+  from <-
+    optional (strOption (long "from" <> metavar "ADDRESS" <> help "Sender's e-mail address"))
+  to <-
+    optional (strOption (long "to" <> metavar "ADDRESS" <> help "Receiver's e-mail address"))
+  isOpen <-
+    optional (option auto (long "is-open" <> help "Only opened e-mails"))
+  tag <-
+    optional (strOption (long "tag" <> metavar "X-TAG"))
+  pure LogMessages {..}
+
+logMessage :: Parser String
+logMessage =
+  argument str (metavar "ID")
 
 smtpSend :: Parser SmtpSend
 smtpSend = do
