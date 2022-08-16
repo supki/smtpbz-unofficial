@@ -40,5 +40,7 @@ main = do
       Api.unsubscribeRemoveAll cfg
     OptsSmtpSend cmdOpts ->
       Api.sendSmtp cfg cmdOpts
+    OptsCheckEmail address ->
+      Api.checkEmail cfg address
   Api.debugPrintResponse res
   unless (Api.successfulCall res) exitFailure

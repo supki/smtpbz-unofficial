@@ -17,6 +17,7 @@ module Api
   , unsubscribeRemove
   , unsubscribeRemoveAll
   , sendSmtp
+  , checkEmail
   , successfulCall
   , debugPrintResponse
   ) where
@@ -154,6 +155,10 @@ sendSmtp cfg SmtpSend {..} = do
     , ("html", pure html)
     , ("text", text)
     ]
+
+checkEmail :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
+checkEmail cfg email =
+  simpleApiCall cfg (printf "check/email/%s" email)
 
 simpleApiCall :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
 simpleApiCall cfg path = do

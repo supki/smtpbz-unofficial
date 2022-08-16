@@ -27,6 +27,7 @@ data Opts
   | OptsUnsubscribeRemove ByteString
   | OptsUnsubscribeRemoveAll
   | OptsSmtpSend SmtpSend
+  | OptsCheckEmail String
     deriving (Show, Eq)
 
 get :: IO Opts
@@ -70,6 +71,9 @@ parser =
 
    <> command "smtp-send"
         (info (fmap OptsSmtpSend smtpSend) (progDesc "Send an e-mail"))
+
+   <> command "check-email"
+        (info (fmap OptsCheckEmail checkEmail) (progDesc "Validate e-mail address"))
     )
 
 userDomain :: Parser String
@@ -137,3 +141,7 @@ smtpSend = do
   text <-
     optional (strOption (long "text" <> help "Mail's text in text format"))
   pure SmtpSend {..}
+
+checkEmail :: Parser String
+checkEmail =
+  argument str (metavar "ADDRESS")
