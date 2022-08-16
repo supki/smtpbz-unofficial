@@ -3,6 +3,7 @@
 module Api
   ( LogMessages(..)
   , SmtpSend(..)
+  , Unsubscribe(..)
   , user
   , userStats
   , userDomains
@@ -11,6 +12,10 @@ module Api
   , userIP
   , logMessages
   , logMessage
+  , unsubscribe
+  , unsubscribeAdd
+  , unsubscribeRemove
+  , unsubscribeRemoveAll
   , sendSmtp
   , successfulCall
   , debugPrintResponse
@@ -53,32 +58,6 @@ userIP :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
 userIP cfg ip = do
   simpleApiCall cfg (printf "user/ip/%s" ip)
 
-data SmtpSend = SmtpSend
-  { from    :: ByteString
-  , name    :: Maybe ByteString
-  , subject :: ByteString
-  , to      :: ByteString
-  , replyTo :: Maybe ByteString
-  , html    :: ByteString
-  , text    :: Maybe ByteString
-  -- , headers :: ByteString ???
-  } deriving (Show, Eq)
-
-sendSmtp :: Cfg -> SmtpSend -> IO (Http.Response Lazy.ByteString)
-sendSmtp cfg SmtpSend {..} = do
-  req <- prepareApiCall cfg "smtp/send"
-  callApi cfg (Http.urlEncodedBody (collapse params) req)
- where
-  params =
-    [ ("from", pure from)
-    , ("name", name)
-    , ("subject", pure subject)
-    , ("to", pure to)
-    , ("reply", replyTo)
-    , ("html", pure html)
-    , ("text", text)
-    ]
-
 data LogMessages = LogMessages
   { limit  :: Maybe Int
   , offset :: Maybe Int
@@ -107,6 +86,74 @@ logMessages cfg LogMessages {..} = do
 logMessage :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
 logMessage cfg messageID = do
   simpleApiCall cfg (printf "log/message/%s" messageID)
+
+data Unsubscribe = Unsubscribe
+  { limit   :: Maybe Int
+  , offset  :: Maybe Int
+  , address :: Maybe ByteString
+  , reason  :: Maybe ByteString
+  } deriving (Show, Eq)
+
+unsubscribe :: Cfg -> Unsubscribe -> IO (Http.Response Lazy.ByteString)
+unsubscribe cfg Unsubscribe {..} = do
+  req <- prepareApiCall cfg "unsubscribe"
+  callApi cfg (Http.setQueryString params req)
+ where
+  params =
+    [ ("limit", fmap (fromString . show) limit)
+    , ("offset", fmap (fromString . show) offset)
+    , ("address", address)
+    , ("reason", reason)
+    ]
+
+unsubscribeAdd :: Cfg -> ByteString -> IO (Http.Response Lazy.ByteString)
+unsubscribeAdd cfg address = do
+  req <- prepareApiCall cfg "unsubscribe/add"
+  callApi cfg (Http.urlEncodedBody params req)
+ where
+  params =
+    [ ("address", address)
+    ]
+
+unsubscribeRemove :: Cfg -> ByteString -> IO (Http.Response Lazy.ByteString)
+unsubscribeRemove cfg address = do
+  req <- prepareApiCall cfg "unsubscribe/remove"
+  callApi cfg (Http.urlEncodedBody params req)
+ where
+  params =
+    [ ("address", address)
+    ]
+
+unsubscribeRemoveAll :: Cfg -> IO (Http.Response Lazy.ByteString)
+unsubscribeRemoveAll cfg = do
+  req <- prepareApiCall cfg "unsubscribe/removeall"
+  callApi cfg (Http.urlEncodedBody [] req)
+
+data SmtpSend = SmtpSend
+  { from    :: ByteString
+  , name    :: Maybe ByteString
+  , subject :: ByteString
+  , to      :: ByteString
+  , replyTo :: Maybe ByteString
+  , html    :: ByteString
+  , text    :: Maybe ByteString
+  -- , headers :: ByteString ???
+  } deriving (Show, Eq)
+
+sendSmtp :: Cfg -> SmtpSend -> IO (Http.Response Lazy.ByteString)
+sendSmtp cfg SmtpSend {..} = do
+  req <- prepareApiCall cfg "smtp/send"
+  callApi cfg (Http.urlEncodedBody (collapse params) req)
+ where
+  params =
+    [ ("from", pure from)
+    , ("name", name)
+    , ("subject", pure subject)
+    , ("to", pure to)
+    , ("reply", replyTo)
+    , ("html", pure html)
+    , ("text", text)
+    ]
 
 simpleApiCall :: Cfg -> String -> IO (Http.Response Lazy.ByteString)
 simpleApiCall cfg path = do

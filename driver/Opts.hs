@@ -6,10 +6,11 @@ module Opts
   , get
   ) where
 
+import Data.ByteString (ByteString)
 import Options.Applicative
 
 import Cfg (usageHeader)
-import Api (LogMessages(..), SmtpSend(..))
+import Api (LogMessages(..), Unsubscribe(..), SmtpSend(..))
 
 
 data Opts
@@ -21,6 +22,10 @@ data Opts
   | OptsUserIP String
   | OptsLogMessages LogMessages
   | OptsLogMessage String
+  | OptsUnsubscribe Unsubscribe
+  | OptsUnsubscribeAdd ByteString
+  | OptsUnsubscribeRemove ByteString
+  | OptsUnsubscribeRemoveAll
   | OptsSmtpSend SmtpSend
     deriving (Show, Eq)
 
@@ -51,6 +56,17 @@ parser =
         (info (fmap OptsLogMessages logMessages) (progDesc "Get sent e-mails"))
    <> command "log-message"
         (info (fmap OptsLogMessage logMessage) (progDesc "Get sent e-mail by ID"))
+
+   <> command "unsubscribe"
+        (info (fmap OptsUnsubscribe unsubscribe) (progDesc "Get unsubscribed e-mail addresses"))
+   <> command "unsubscribe-add"
+        (info (fmap OptsUnsubscribeAdd unsubscribeAdd) (progDesc "Unsubscribe e-mail address"))
+   <> command "unsubscribe-remove"
+        (info
+          (fmap OptsUnsubscribeRemove unsubscribeRemove)
+          (progDesc "Remove e-mail address from unsubscribed"))
+   <> command "unsubscribe-remove-all"
+        (info (pure OptsUnsubscribeRemoveAll) (progDesc "Clear unsubscribed e-email addresses"))
 
    <> command "smtp-send"
         (info (fmap OptsSmtpSend smtpSend) (progDesc "Send an e-mail"))
@@ -83,6 +99,26 @@ logMessages = do
 logMessage :: Parser String
 logMessage =
   argument str (metavar "ID")
+
+unsubscribe :: Parser Unsubscribe
+unsubscribe = do
+  limit <-
+    optional (option auto (long "limit"))
+  offset <-
+    optional (option auto (long "offset"))
+  address <-
+    optional (strOption (long "address" <> metavar "ADDRESS"))
+  reason <-
+    optional (strOption (long "reason" <> metavar "bounce|user|unsubscribe"))
+  pure Unsubscribe {..}
+
+unsubscribeAdd :: Parser ByteString
+unsubscribeAdd =
+  argument str (metavar "ADDRESS")
+
+unsubscribeRemove :: Parser ByteString
+unsubscribeRemove =
+  argument str (metavar "ADDRESS")
 
 smtpSend :: Parser SmtpSend
 smtpSend = do

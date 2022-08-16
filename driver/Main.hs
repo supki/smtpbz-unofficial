@@ -30,6 +30,14 @@ main = do
       Api.logMessages cfg logMessages
     OptsLogMessage messageID ->
       Api.logMessage cfg messageID
+    OptsUnsubscribe unsubscribe ->
+      Api.unsubscribe cfg unsubscribe
+    OptsUnsubscribeAdd address ->
+      Api.unsubscribeAdd cfg address
+    OptsUnsubscribeRemove address ->
+      Api.unsubscribeRemove cfg address
+    OptsUnsubscribeRemoveAll ->
+      Api.unsubscribeRemoveAll cfg
     OptsSmtpSend cmdOpts ->
       Api.sendSmtp cfg cmdOpts
   Api.debugPrintResponse res
