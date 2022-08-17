@@ -9,8 +9,9 @@ module Opts
 import Data.ByteString (ByteString)
 import Options.Applicative
 
+import Smtpbz (LogMessages(..), Unsubscribe(..), SmtpSend(..))
+
 import Cfg (usageHeader)
-import Api (LogMessages(..), Unsubscribe(..), SmtpSend(..))
 
 
 data Opts

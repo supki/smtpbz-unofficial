@@ -13,7 +13,7 @@ import           Env
 import qualified Network.HTTP.Conduit as Http
 
 import qualified Meta_smtpbz as Meta
-import           Has (Has(..))
+import           Smtpbz (Has(..))
 
 
 data Cfg = Cfg

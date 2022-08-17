@@ -1,5 +1,5 @@
 {-# LANGUAGE RankNTypes #-}
-module Has
+module Smtpbz.Internal.Has
   ( Has(..)
   , Lens
   , Lens'

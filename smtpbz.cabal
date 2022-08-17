@@ -28,8 +28,9 @@ custom-setup
 
 library
   exposed-modules:
-      Api
-      Has
+      Smtpbz
+      Smtpbz.Internal.Api
+      Smtpbz.Internal.Has
   other-modules:
       Paths_smtpbz
   hs-source-dirs:
