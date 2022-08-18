@@ -1,7 +1,7 @@
 smtpbz
 ===
 
-An API-wrapper for https://smtp.bz/
+An unofficial API-wrapper for https://smtp.bz/
 
 Example usage:
 

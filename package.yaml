@@ -30,8 +30,6 @@ library:
     - bytestring
     - http-conduit
     - http-types
-    - servant-multipart
-    - servant-server
     - text
   source-dirs:
     src
@@ -47,8 +45,8 @@ executables:
       - bytestring
       - envparse
       - http-conduit
-      - text
       - optparse-applicative
+      - text
     source-dirs:
       driver
     main:
@@ -58,22 +56,6 @@ executables:
       - Opts
       - Meta_smtpbz
     ghc-options:
-      - -Wall
-      - -Werror
-      - -threaded
-      - -with-rtsopts=-N
-
-tests:
-  spec:
-    dependencies:
-      - smtpbz
-      - hspec
-    source-dirs:
-      test
-    main:
-      Spec.hs
-    ghc-options:
-      - -freduction-depth=0
       - -Wall
       - -Werror
       - -threaded
