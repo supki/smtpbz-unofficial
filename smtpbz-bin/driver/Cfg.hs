@@ -12,7 +12,7 @@ import           Data.Text (Text)
 import           Env
 import qualified Network.HTTP.Conduit as Http
 
-import qualified Meta_smtpbz as Meta
+import qualified Meta_smtpbz_bin as Meta
 import           Smtpbz (Has(..))
 
 

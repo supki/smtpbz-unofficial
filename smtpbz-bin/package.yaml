@@ -1,6 +1,6 @@
-name:                smtpbz
+name:                smtpbz-bin
 version:             1.0.0
-synopsis:            This is smtpbz
+synopsis:            This is smtpbz-bin
 description:         See README.markdown
 license:             BSD2
 author:              Matvey Aksenov
@@ -24,20 +24,6 @@ dependencies:
 default-extensions:
   - OverloadedStrings
 
-library:
-  dependencies:
-    - aeson
-    - bytestring
-    - http-conduit
-    - http-types
-    - text
-  source-dirs:
-    src
-  ghc-options:
-    - -funbox-strict-fields
-    - -Wall
-    - -Werror
-
 executables:
   smtpbz:
     dependencies:
@@ -54,7 +40,7 @@ executables:
     other-modules:
       - Cfg
       - Opts
-      - Meta_smtpbz
+      - Meta_smtpbz_bin
     ghc-options:
       - -Wall
       - -Werror
