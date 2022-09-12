@@ -1,23 +1,31 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE RecordWildCards #-}
+-- | Reference: https://docs.smtp.bz/#/api
+--
+-- The response bodies are really un(der)specified, so this library doesn't
+-- try to do to much with them. You are on your own.
+--
+-- Functions' names map (trivially) to API routes. So, for some of them,
+-- it's not obvious what they do from their name. This is by design.
 module Smtpbz.Internal.Api
-  ( LogMessages(..)
-  , SmtpSend(..)
-  , Unsubscribe(..)
-  , user
+  ( user
   , userStats
   , userDomains
   , userDomain
   , userIPs
   , userIP
+  , LogMessages(..)
   , logMessages
   , logMessage
+  , Unsubscribe(..)
   , unsubscribe
   , unsubscribeAdd
   , unsubscribeRemove
   , unsubscribeRemoveAll
+  , SmtpSend(..)
   , sendSmtp
   , checkEmail
+
   , successfulCall
   , debugPrintResponse
   ) where
@@ -35,26 +43,32 @@ import           Text.Printf (printf)
 import           Smtpbz.Internal.Has (Has(..), view)
 
 
+-- | User data.
 user :: Has smtpbz => smtpbz -> IO (Http.Response Lazy.ByteString)
 user smtpbz =
   simpleApiCall smtpbz "user"
 
+-- | User's mail distribution statistics.
 userStats :: Has smtpbz => smtpbz -> IO (Http.Response Lazy.ByteString)
 userStats smtpbz =
   simpleApiCall smtpbz "user/stats"
 
+-- | User's domains data.
 userDomains :: Has smtpbz => smtpbz -> IO (Http.Response Lazy.ByteString)
 userDomains smtpbz =
   simpleApiCall smtpbz "user/domain"
 
+-- | User's specific domain data.
 userDomain :: Has smtpbz => smtpbz -> String -> IO (Http.Response Lazy.ByteString)
 userDomain smtpbz domain =
   simpleApiCall smtpbz (printf "user/domain/%s" domain)
 
+-- | User's IPs data.
 userIPs :: Has smtpbz => smtpbz -> IO (Http.Response Lazy.ByteString)
 userIPs smtpbz =
   simpleApiCall smtpbz "user/ip"
 
+-- | User's specific IP data.
 userIP :: Has smtpbz => smtpbz -> String -> IO (Http.Response Lazy.ByteString)
 userIP smtpbz ip = do
   simpleApiCall smtpbz (printf "user/ip/%s" ip)
@@ -68,6 +82,7 @@ data LogMessages = LogMessages
   , tag    :: Maybe ByteString
   } deriving (Show, Eq)
 
+-- | Message log search.
 logMessages :: Has smtpbz => smtpbz -> LogMessages -> IO (Http.Response Lazy.ByteString)
 logMessages smtpbz LogMessages {..} = do
   req <- prepareApiCall smtpbz "log/message"
@@ -84,6 +99,7 @@ logMessages smtpbz LogMessages {..} = do
     , ("tag", tag)
     ]
 
+-- | Look up a specific message.
 logMessage :: Has smtpbz => smtpbz -> String -> IO (Http.Response Lazy.ByteString)
 logMessage smtpbz messageID = do
   simpleApiCall smtpbz (printf "log/message/%s" messageID)
@@ -95,6 +111,7 @@ data Unsubscribe = Unsubscribe
   , reason  :: Maybe ByteString
   } deriving (Show, Eq)
 
+-- | List of e-mail addresses mail is not delivired to.
 unsubscribe :: Has smtpbz => smtpbz -> Unsubscribe -> IO (Http.Response Lazy.ByteString)
 unsubscribe smtpbz Unsubscribe {..} = do
   req <- prepareApiCall smtpbz "unsubscribe"
@@ -107,6 +124,7 @@ unsubscribe smtpbz Unsubscribe {..} = do
     , ("reason", reason)
     ]
 
+-- | Ignore an address.
 unsubscribeAdd :: Has smtpbz => smtpbz -> ByteString -> IO (Http.Response Lazy.ByteString)
 unsubscribeAdd smtpbz address = do
   req <- prepareApiCall smtpbz "unsubscribe/add"
@@ -116,6 +134,7 @@ unsubscribeAdd smtpbz address = do
     [ ("address", address)
     ]
 
+-- | Stop ignoring an address.
 unsubscribeRemove :: Has smtpbz => smtpbz -> ByteString -> IO (Http.Response Lazy.ByteString)
 unsubscribeRemove smtpbz address = do
   req <- prepareApiCall smtpbz "unsubscribe/remove"
@@ -125,6 +144,7 @@ unsubscribeRemove smtpbz address = do
     [ ("address", address)
     ]
 
+-- | Stop ignoring all previously ignored addresses.
 unsubscribeRemoveAll :: Has smtpbz => smtpbz -> IO (Http.Response Lazy.ByteString)
 unsubscribeRemoveAll smtpbz = do
   req <- prepareApiCall smtpbz "unsubscribe/removeall"
@@ -141,6 +161,7 @@ data SmtpSend = SmtpSend
   -- , headers :: ByteString ???
   } deriving (Show, Eq)
 
+--- | Send an email.
 sendSmtp :: Has smtpbz => smtpbz -> SmtpSend -> IO (Http.Response Lazy.ByteString)
 sendSmtp smtpbz SmtpSend {..} = do
   req <- prepareApiCall smtpbz "smtp/send"
@@ -156,6 +177,7 @@ sendSmtp smtpbz SmtpSend {..} = do
     , ("text", text)
     ]
 
+--- | Check email address validity.
 checkEmail :: Has smtpbz => smtpbz -> String -> IO (Http.Response Lazy.ByteString)
 checkEmail smtpbz email =
   simpleApiCall smtpbz (printf "check/email/%s" email)
@@ -176,12 +198,14 @@ callApi :: Has smtpbz => smtpbz -> Http.Request -> IO (Http.Response Lazy.ByteSt
 callApi smtpbz req =
   Http.httpLbs req (view httpMan smtpbz)
 
+-- | Check if response status code is in [200, 300).
 successfulCall :: Http.Response Lazy.ByteString -> Bool
 successfulCall res =
   case Http.responseStatus res of
     st ->
       Http.status200 <= st && st < Http.status300
 
+-- | Print response body to stdout.
 debugPrintResponse :: Http.Response Lazy.ByteString -> IO ()
 debugPrintResponse =
   ByteString.Lazy.putStrLn . Http.responseBody

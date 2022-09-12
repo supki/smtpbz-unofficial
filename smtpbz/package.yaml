@@ -6,6 +6,7 @@ license:             BSD2
 author:              Matvey Aksenov
 maintainer:          matvey.aksenov@gmail.com
 copyright:           2022 Matvey Aksenov
+category:            Web
 extra-source-files:
   - README.markdown
   - CHANGELOG.markdown

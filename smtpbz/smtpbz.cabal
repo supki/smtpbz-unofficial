@@ -8,6 +8,7 @@ name:           smtpbz
 version:        1.0.0
 synopsis:       This is smtpbz
 description:    See README.markdown
+category:       Web
 author:         Matvey Aksenov
 maintainer:     matvey.aksenov@gmail.com
 copyright:      2022 Matvey Aksenov

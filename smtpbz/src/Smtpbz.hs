@@ -3,5 +3,5 @@ module Smtpbz
   , module Smtpbz.Internal.Api
   ) where
 
-import Smtpbz.Internal.Has
+import Smtpbz.Internal.Has (Has(..), Lens, Lens')
 import Smtpbz.Internal.Api
