@@ -1,6 +1,6 @@
 name:                smtpbz
-version:             1.0.0
-synopsis:            This is smtpbz
+version:             1.0.1
+synopsis:            Unofficial API client for smtp.bz
 description:         See README.markdown
 license:             BSD2
 author:              Matvey Aksenov
@@ -10,6 +10,7 @@ category:            Web
 extra-source-files:
   - README.markdown
   - CHANGELOG.markdown
+github: supki/smtpbz-unofficial
 
 dependencies:
   - base >= 4.7 && < 5

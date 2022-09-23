@@ -1,6 +1,6 @@
 name:                smtpbz-bin
 version:             1.0.0
-synopsis:            This is smtpbz-bin
+synopsis:            Unofficial API client for smtp.bz CLI
 description:         See README.markdown
 license:             BSD2
 author:              Matvey Aksenov
@@ -9,6 +9,7 @@ copyright:           2022 Matvey Aksenov
 extra-source-files:
   - README.markdown
   - CHANGELOG.markdown
+github: supki/smtpbz-unofficial
 
 custom-setup:
   dependencies:

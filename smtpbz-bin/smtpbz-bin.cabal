@@ -6,8 +6,10 @@ cabal-version: 1.24
 
 name:           smtpbz-bin
 version:        1.0.0
-synopsis:       This is smtpbz-bin
+synopsis:       Unofficial API client for smtp.bz CLI
 description:    See README.markdown
+homepage:       https://github.com/supki/smtpbz-unofficial#readme
+bug-reports:    https://github.com/supki/smtpbz-unofficial/issues
 author:         Matvey Aksenov
 maintainer:     matvey.aksenov@gmail.com
 copyright:      2022 Matvey Aksenov
@@ -16,6 +18,10 @@ build-type:     Custom
 extra-source-files:
     README.markdown
     CHANGELOG.markdown
+
+source-repository head
+  type: git
+  location: https://github.com/supki/smtpbz-unofficial
 
 custom-setup
   setup-depends:

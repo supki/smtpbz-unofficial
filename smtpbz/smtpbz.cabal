@@ -5,10 +5,12 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           smtpbz
-version:        1.0.0
-synopsis:       This is smtpbz
+version:        1.0.1
+synopsis:       Unofficial API client for smtp.bz
 description:    See README.markdown
 category:       Web
+homepage:       https://github.com/supki/smtpbz-unofficial#readme
+bug-reports:    https://github.com/supki/smtpbz-unofficial/issues
 author:         Matvey Aksenov
 maintainer:     matvey.aksenov@gmail.com
 copyright:      2022 Matvey Aksenov
@@ -18,6 +20,10 @@ build-type:     Simple
 extra-source-files:
     README.markdown
     CHANGELOG.markdown
+
+source-repository head
+  type: git
+  location: https://github.com/supki/smtpbz-unofficial
 
 library
   exposed-modules:
