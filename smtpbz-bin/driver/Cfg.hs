@@ -23,15 +23,12 @@ data Cfg = Cfg
   }
 
 instance Has Cfg where
-  apiKey l cfg =
-    fmap (\key -> cfg {cfgApiKey = key}) (l (cfgApiKey cfg))
-  {-# INLINE apiKey #-}
-  baseUrl l cfg =
-    fmap (\url -> cfg {cfgBaseUrl = url}) (l (cfgBaseUrl cfg))
-  {-# INLINE baseUrl #-}
-  httpMan l cfg =
-    fmap (\man -> cfg {cfgMan = man}) (l (cfgMan cfg))
-  {-# INLINE httpMan #-}
+  apiKey =
+    cfgApiKey
+  baseUrl =
+    cfgBaseUrl
+  httpMan =
+    cfgMan
 
 get :: IO Cfg
 get = do

@@ -1,11 +1,8 @@
 { pkgs ? import <nixpkgs> { }
-, ghc ? pkgs.haskell.compiler.ghc8107
-, stack ? pkgs.stack
+, ghc ? pkgs.haskell.compiler.ghc965
 }:
 
 pkgs.mkShell rec {
-  LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath buildInputs;
-
   buildInputs = with pkgs; [
     ghc
     glibcLocales
@@ -15,5 +12,7 @@ pkgs.mkShell rec {
   ];
 
   shellHook = ''
+    export \
+      LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath buildInputs}"
   '';
 }

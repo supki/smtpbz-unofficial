@@ -40,7 +40,7 @@ import qualified Network.HTTP.Conduit as Http
 import qualified Network.HTTP.Types as Http
 import           Text.Printf (printf)
 
-import           Smtpbz.Internal.Has (Has(..), view)
+import           Smtpbz.Internal.Has (Has(..))
 
 
 -- | User data.
@@ -189,14 +189,14 @@ simpleApiCall smtpbz path = do
 
 prepareApiCall :: Has smtpbz => smtpbz -> String -> IO Http.Request
 prepareApiCall smtpbz path = do
-  req <- Http.parseRequest (printf "%s/%s" (view baseUrl smtpbz) path)
+  req <- Http.parseRequest (printf "%s/%s" (baseUrl smtpbz) path)
   pure req
-    { Http.requestHeaders = ("Authorization", view apiKey smtpbz) : Http.requestHeaders req
+    { Http.requestHeaders = ("Authorization", apiKey smtpbz) : Http.requestHeaders req
     }
 
 callApi :: Has smtpbz => smtpbz -> Http.Request -> IO (Http.Response Lazy.ByteString)
 callApi smtpbz req =
-  Http.httpLbs req (view httpMan smtpbz)
+  Http.httpLbs req (httpMan smtpbz)
 
 -- | Check if response status code is in [200, 300).
 successfulCall :: Http.Response Lazy.ByteString -> Bool
