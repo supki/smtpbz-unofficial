@@ -1,13 +1,13 @@
 module Main (main) where
 
-import           Control.Monad (unless)
-import           System.Exit (exitFailure)
+import Control.Monad (unless)
+import System.Exit (exitFailure)
 
-import qualified Cfg
-import qualified Opts
-import           Opts (Opts(..))
+import Smtpbz qualified
 
-import qualified Smtpbz
+import Cfg qualified
+import Opts qualified
+import Opts (Opts(..))
 
 
 main :: IO ()

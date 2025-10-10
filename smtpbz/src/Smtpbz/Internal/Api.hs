@@ -30,17 +30,18 @@ module Smtpbz.Internal.Api
   , debugPrintResponse
   ) where
 
-import           Data.Bool (bool)
-import           Data.ByteString (ByteString)
-import qualified Data.ByteString.Lazy as Lazy (ByteString)
-import qualified Data.ByteString.Lazy.Char8 as ByteString.Lazy
-import           Data.Maybe (mapMaybe)
-import           Data.String (fromString)
-import qualified Network.HTTP.Conduit as Http
-import qualified Network.HTTP.Types as Http
-import           Text.Printf (printf)
+import Data.Bool (bool)
+import Data.ByteString (ByteString)
+import Data.ByteString.Lazy qualified as Lazy (ByteString)
+import Data.ByteString.Lazy.Char8 qualified as ByteString.Lazy
+import Data.Maybe (mapMaybe)
+import Data.String (fromString)
+import Network.HTTP.Conduit qualified as Http
+import Network.HTTP.Types qualified as Http
+import Text.Printf (printf)
 
-import           Smtpbz.Internal.Has (Has(..))
+import Smtpbz.Internal.Has (Has(..))
+import Smtpbz.Internal.Manager (Manager(..))
 
 
 -- | User data.
@@ -196,7 +197,7 @@ prepareApiCall smtpbz path = do
 
 callApi :: Has smtpbz => smtpbz -> Http.Request -> IO (Http.Response Lazy.ByteString)
 callApi smtpbz req =
-  Http.httpLbs req (httpMan smtpbz)
+  Http.httpLbs req (unManager (httpMan smtpbz))
 
 -- | Check if response status code is in [200, 300).
 successfulCall :: Http.Response Lazy.ByteString -> Bool

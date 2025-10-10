@@ -1,11 +1,11 @@
 cabal-version: 1.24
 
--- This file has been generated from package.yaml by hpack version 0.34.7.
+-- This file has been generated from package.yaml by hpack version 0.38.0.
 --
 -- see: https://github.com/sol/hpack
 
 name:           smtpbz-bin
-version:        1.0.0
+version:        1.2.0
 synopsis:       Unofficial API client for smtp.bz CLI
 description:    See README.markdown
 homepage:       https://github.com/supki/smtpbz-unofficial#readme
@@ -41,12 +41,12 @@ executable smtpbz
       driver
   default-extensions:
       OverloadedStrings
+      ImportQualifiedPost
   ghc-options: -Wall -Werror -threaded -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , bytestring
     , envparse
-    , http-conduit
     , optparse-applicative
     , smtpbz
     , text

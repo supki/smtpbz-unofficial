@@ -1,20 +1,20 @@
 {-# LANGUAGE NamedFieldPuns #-}
 module Main (main) where
 
-import qualified Data.Char as Char
-import qualified Data.List as List
-import           Distribution.Package (PackageIdentifier(..), unPackageName)
-import           Distribution.PackageDescription (PackageDescription(package))
-import           Distribution.Pretty (prettyShow)
-import           Distribution.Simple (defaultMainWithHooks, simpleUserHooks, buildHook)
-import           Distribution.Simple.BuildPaths (autogenPackageModulesDir)
-import           Distribution.Simple.LocalBuildInfo (LocalBuildInfo, localPkgDescr)
-import           Distribution.Simple.Setup (BuildFlags(buildVerbosity), fromFlag)
-import           Distribution.Simple.Utils (notice, rewriteFileEx)
-import           System.Directory (createDirectoryIfMissing)
-import           System.FilePath ((</>), (<.>))
-import           System.IO.Error (catchIOError)
-import           System.Process (readProcess)
+import Data.Char qualified as Char
+import Data.List qualified as List
+import Distribution.Package (PackageIdentifier(..), unPackageName)
+import Distribution.PackageDescription (PackageDescription(package))
+import Distribution.Pretty (prettyShow)
+import Distribution.Simple (defaultMainWithHooks, simpleUserHooks, buildHook)
+import Distribution.Simple.BuildPaths (autogenPackageModulesDir)
+import Distribution.Simple.LocalBuildInfo (LocalBuildInfo, localPkgDescr)
+import Distribution.Simple.Setup (BuildFlags(buildVerbosity), fromFlag)
+import Distribution.Simple.Utils (notice, rewriteFileEx)
+import System.Directory (createDirectoryIfMissing)
+import System.FilePath ((</>), (<.>))
+import System.IO.Error (catchIOError)
+import System.Process (readProcess)
 
 
 main :: IO ()
